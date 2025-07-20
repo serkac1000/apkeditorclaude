@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android App Builder Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --success: #4facfe;
+            --error: #f5576c;
+            --warning: #feca57;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+        }
+        
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: slideDown 0.8s ease-out;
+        }
+        
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #fff, #a8d8ea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }   
+     
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .version-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 2.5rem;
+            }
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+        }
+        
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }        
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }       
+ 
+        .btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover:before {
+            left: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--error) 100%);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #00f2fe 100%);
+        }
+        
+        .btn-large {
+            padding: 20px 40px;
+            font-size: 16px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .status {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        } 
+       
+        .status.success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .status.error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .status.info {
+            background: linear-gradient(135deg, #cce7ff, #b8daff);
+            color: #004085;
+            border-left: 4px solid #007bff;
+        }
+        
+        .status.warning {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            color: #856404;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .preview-section {
+            grid-column: 1 / -1;
+        }
+        
+        .preview-container {
+            background: linear-gradient(135deg, #2d3748, #1a202c);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .preview-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102,126,234,0.1) 0%, transparent 50%);
+            animation: rotate 20s linear infinite;
+        }  
+      
+        .phone-preview {
+            background: linear-gradient(145deg, #1a202c, #2d3748);
+            border-radius: 30px;
+            width: 320px;
+            height: 640px;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .phone-screen {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes rotate {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }        
+ 
+       .code-output {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 15px;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 15px;
+            border: 1px solid #333;
+            position: relative;
+        }
+        
+        .code-output::before {
+            content: 'Generated Code';
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: #1a1a1a;
+            color: #888;
+            padding: 0 10px;
+            font-size: 12px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+        
+        .feature-item {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }  
+      
+        .feature-item h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .feature-item p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .tabs {
+            display: flex;
+            background: rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: 6px;
+            margin-bottom: 25px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px 20px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            color: var(--primary);
+        }
+        
+        .tab:not(.active):hover {
+            background: rgba(255,255,255,0.5);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e1e5e9;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 15px 0;
+        }  
+      
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+        
+        .ai-thinking {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+        
+        .ai-dots {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .ai-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: aiThinking 1.4s ease-in-out infinite both;
+        }
+        
+        .ai-dot:nth-child(1) { animation-delay: -0.32s; }
+        .ai-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes aiThinking {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1.2); opacity: 1; }
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }     
+   
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        
+        .api-key-input {
+            position: relative;
+        }
+        
+        .api-key-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .export-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .floating-assistant {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .floating-assistant:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* New styles for project management */
+        .project-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+            border: 1px solid #e1e5e9;
+            border-radius: 12px;
+        }
+        
+        .project-item {
+            padding: 15px;
+            border-bottom: 1px solid #e1e5e9;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .project-item:last-child {
+            border-bottom: none;
+        }
+        
+        .project-item:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+        
+        .project-item h4 {
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+        
+        .project-item p {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        /* Signing options */
+        .signing-options {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #e1e5e9;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body> 
+   <div class="container">
+        <div class="header">
+            <h1>🚀 Android App Builder Pro</h1>
+            <p>Advanced AI-powered Android app generation with Gemini</p>
+            <div class="version-badge">v2.1 Pro</div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Configuration Panel -->
+            <div class="card">
+                <h2>⚙️ Configuration</h2>
+                
+                <div class="form-group">
+                    <label for="apiKey">Gemini API Key:</label>
+                    <div class="api-key-input">
+                        <input type="password" id="apiKey" placeholder="Enter your Gemini API key">
+                        <button type="button" class="api-key-toggle" onclick="toggleApiKeyVisibility()">👁️</button>
+                    </div>
+                    <small style="color: #666; font-size: 12px;">Get your API key from <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="appName">App Name:</label>
+                    <input type="text" id="appName" value="MyAwesomeApp" placeholder="Enter app name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="appDescription">App Description:</label>
+                    <textarea id="appDescription" placeholder="Describe your app in detail...">Create a modern weather application that displays current conditions, hourly forecasts, and 7-day weather predictions. Include location-based weather, beautiful animations, and a clean Material Design interface.</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="appCategory">App Category:</label>
+                    <select id="appCategory">
+                        <option value="weather">Weather</option>
+                        <option value="productivity">Productivity</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="social">Social</option>
+                        <option value="utility">Utility</option>
+                        <option value="game">Game</option>
+                        <option value="education">Education</option>
+                        <option value="lifestyle">Lifestyle</option>
+                        <option value="business">Business</option>
+                        <option value="health">Health & Fitness</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" onclick="testGeminiAPI(false)">
+                        <span id="testBtnText">🔧 Test API Connection</span>
+                    </button>
+                    
+                    <button class="btn btn-success" onclick="testGeminiAPI(true)">
+                        <span>🔧 Test API + Save</span>
+                    </button>
+                </div>
+                
+                <div id="apiStatus"></div>
+                
+                <!-- Project Management -->
+                <div style="margin-top: 20px;">
+                    <h3 style="margin-bottom: 15px; color: var(--primary);">💾 Project Management</h3>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn" onclick="saveProject()">
+                            <span>💾 Save Project</span>
+                        </button>
+                        
+                        <button class="btn" onclick="loadProjectList()">
+                            <span>📂 Load Project</span>
+                        </button>
+                    </div>
+                    
+                    <div id="projectStatus"></div>
+                    <div id="projectList" style="display: none;"></div>
+                </div>
+            </div>    
+        
+            <!-- Generation Panel -->
+            <div class="card">
+                <h2>🎯 Generate App</h2>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('basic')">Basic</button>
+                    <button class="tab" onclick="switchTab('advanced')">Advanced</button>
+                    <button class="tab" onclick="switchTab('templates')">Templates</button>
+                </div>
+                
+                <div id="basic-tab" class="tab-content active">
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <h4>🎨 Modern UI</h4>
+                            <p>Material Design 3 with adaptive layouts</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>⚡ AI Generated</h4>
+                            <p>Powered by Google Gemini AI</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>📱 Native Code</h4>
+                            <p>Java/Kotlin with latest APIs</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>🔧 Complete Project</h4>
+                            <p>Ready-to-build Android Studio project</p>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-secondary btn-large" onclick="generateAndroidApp()">
+                        <span id="generateBtnText">🎯 Generate Android App</span>
+                    </button>
+                </div>
+                
+                <div id="advanced-tab" class="tab-content">
+                    <div class="form-group">
+                        <label for="targetSdk">Target SDK Version:</label>
+                        <select id="targetSdk">
+                            <option value="34">Android 14 (API 34)</option>
+                            <option value="33">Android 13 (API 33)</option>
+                            <option value="32">Android 12L (API 32)</option>
+                            <option value="31">Android 12 (API 31)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="language">Programming Language:</label>
+                        <select id="language">
+                            <option value="kotlin">Kotlin (Recommended)</option>
+                            <option value="java">Java</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Additional Features:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="includeDatabase"> Database (Room)
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="includeNetwork"> Network/API Support
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="includeLocation"> Location Services
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="includePush"> Push Notifications
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="includeCamera"> Camera Integration
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="includeMaterial3"> Material Design 3
+                            </div>
+                        </div>
+                    </div>
+                </div>     
+           
+                <div id="templates-tab" class="tab-content">
+                    <div class="features-grid">
+                        <div class="feature-item" onclick="loadTemplate('weather')">
+                            <h4>🌤️ Weather App</h4>
+                            <p>Complete weather application with forecasts</p>
+                        </div>
+                        <div class="feature-item" onclick="loadTemplate('todo')">
+                            <h4>✅ Todo App</h4>
+                            <p>Task management with local storage</p>
+                        </div>
+                        <div class="feature-item" onclick="loadTemplate('chat')">
+                            <h4>💬 Chat App</h4>
+                            <p>Real-time messaging interface</p>
+                        </div>
+                        <div class="feature-item" onclick="loadTemplate('fitness')">
+                            <h4>🏃 Fitness Tracker</h4>
+                            <p>Exercise tracking and health metrics</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="generationProgress" style="display: none;">
+                    <div class="ai-thinking">
+                        <div class="ai-dots">
+                            <div class="ai-dot"></div>
+                            <div class="ai-dot"></div>
+                            <div class="ai-dot"></div>
+                        </div>
+                        <span>AI is crafting your perfect app...</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div id="generationStatus"></div>
+            </div>
+        </div>
+        
+        <!-- Preview Section -->
+        <div class="card preview-section">
+            <h2>📱 App Preview & Code</h2>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchPreviewTab('preview')">Live Preview</button>
+                <button class="tab" onclick="switchPreviewTab('code')">Generated Code</button>
+                <button class="tab" onclick="switchPreviewTab('export')">Export & Build</button>
+                <button class="tab" onclick="switchPreviewTab('docs')">Documentation</button>
+            </div>
+            
+            <div id="preview-tab" class="tab-content active">
+                <div class="preview-container">
+                    <div class="phone-preview">
+                        <div class="phone-screen" id="phoneScreen">
+                            <div style="text-align: center; padding: 80px 20px; color: #666;">
+                                <h3 style="margin-bottom: 15px;">📱 Live Preview</h3>
+                                <p style="margin-bottom: 20px;">Generate an app to see the interactive preview</p>
+                                <div style="font-size: 3rem; margin-bottom: 15px;">🤖</div>
+                                <p style="font-size: 0.9rem; color: #999;">Powered by AI</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>          
+  
+            <div id="code-tab" class="tab-content">
+                <div class="code-output" id="codeOutput">
+// 🤖 AI-Generated Android Code
+// Click "Generate Android App" to start creating your application
+// The complete project structure will appear here including:
+// • MainActivity.java/kt
+// • XML Layouts
+// • AndroidManifest.xml
+// • Build configurations
+// • Resources and assets
+
+public class MainActivity extends AppCompatActivity {
+    // Your AI-generated code will appear here...
+}
+                </div>
+            </div>
+            
+            <div id="export-tab" class="tab-content">
+                <div style="text-align: center; padding: 30px;">
+                    <h3 style="margin-bottom: 15px;">📦 Export Your Project</h3>
+                    <p style="margin-bottom: 30px; color: #666;">Export your generated app as a complete Android Studio project</p>
+                    
+                    <div class="export-options">
+                        <button class="btn btn-success" onclick="exportProject()">
+                            <span id="exportBtnText">💾 Download Project ZIP</span>
+                        </button>
+                        
+                        <button class="btn btn-secondary" onclick="buildAPK()">
+                            <span id="buildBtnText">🔨 Build APK (Demo)</span>
+                        </button>
+                        
+                        <button class="btn" onclick="signAPK()">
+                            <span>🔐 Sign APK</span>
+                        </button>
+                        
+                        <button class="btn" onclick="exportToGitHub()">
+                            <span>🐙 Export to GitHub</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Signing options -->
+                    <div class="signing-options" id="signingOptions" style="display: none;">
+                        <h4 style="margin-bottom: 15px;">APK Signing Options</h4>
+                        
+                        <div class="form-group">
+                            <label for="keystorePassword">Keystore Password:</label>
+                            <input type="password" id="keystorePassword" value="android" placeholder="Enter keystore password">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="keyAlias">Key Alias:</label>
+                            <input type="text" id="keyAlias" value="androidkey" placeholder="Enter key alias">
+                        </div>
+                        
+                        <button class="btn btn-success" onclick="signAndDownloadAPK()">
+                            <span>🔐 Sign and Download APK</span>
+                        </button>
+                    </div>
+                    
+                    <div id="exportStatus"></div>
+                </div>
+            </div>   
+         
+            <div id="docs-tab" class="tab-content">
+                <div style="padding: 20px;">
+                    <h3>📚 Generated Documentation</h3>
+                    <div id="appDocumentation">
+                        <p style="color: #666; text-align: center; margin: 40px 0;">
+                            Documentation will be generated automatically when you create an app
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating AI Assistant -->
+    <div class="floating-assistant" onclick="showAIAssistant()">
+        🤖
+    </div>
+    
+    <script>
+        let generatedCode = null;
+        let currentAppData = null;
+        let savedApiKey = null;
+        
+        // Check for saved API key on load
+        window.addEventListener('DOMContentLoaded', function() {
+            checkForSavedData();
+        });
+        
+        // Function to extract code files from a string
+        function extractCodeFromString(codeString) {
+            // Default empty object for code files
+            let codeObj = {};
+            
+            try {
+                // First try to parse as JSON directly
+                try {
+                    return JSON.parse(codeString);
+                } catch (e) {
+                    // Not valid JSON, continue with extraction
+                }
+                
+                // Look for code blocks with file names
+                const filePatterns = [
+                    /```(?:java|kotlin)\s+([\w.]+)\s*\n([\s\S]*?)```/g,  // ```java MainActivity.java \n code ```
+                    /\/\/\s*File:\s*([\w.]+)\s*\n([\s\S]*?)(?=\/\/\s*File:|$)/g,  // // File: MainActivity.java \n code
+                    /<file\s+name="([\w.]+)"[^>]*>([\s\S]*?)<\/file>/g,  // <file name="MainActivity.java"> code </file>
+                    /# ([\w.]+)\s*\n([\s\S]*?)(?=# [\w.]|$)/g  // # MainActivity.java \n code
+                ];
+                
+                // Try each pattern
+                for (const pattern of filePatterns) {
+                    let match;
+                    let foundMatch = false;
+                    
+                    while ((match = pattern.exec(codeString)) !== null) {
+                        const fileName = match[1].trim();
+                        const fileContent = match[2].trim();
+                        
+                        if (fileName && fileContent) {
+                            codeObj[fileName] = fileContent;
+                            foundMatch = true;
+                        }
+                    }
+                    
+                    if (foundMatch) break;
+                }
+                
+                // If no structured format found, create basic files
+                if (Object.keys(codeObj).length === 0) {
+                    // Extract what looks like Java/Kotlin code for MainActivity
+                    const mainActivityMatch = /(?:public|class)\s+MainActivity[\s\S]*?(?:\{[\s\S]*?\})/g.exec(codeString);
+                    if (mainActivityMatch) {
+                        codeObj["MainActivity.java"] = mainActivityMatch[0];
+                    } else {
+                        codeObj["MainActivity.java"] = "// Generated MainActivity\npublic class MainActivity extends AppCompatActivity {\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        setContentView(R.layout.activity_main);\n    }\n}";
+                    }
+                    
+                    // Extract what looks like XML for layout
+                    const layoutMatch = /<(?:LinearLayout|RelativeLayout|ConstraintLayout)[\s\S]*?<\/(?:LinearLayout|RelativeLayout|ConstraintLayout)>/g.exec(codeString);
+                    if (layoutMatch) {
+                        codeObj["activity_main.xml"] = layoutMatch[0];
+                    } else {
+                        codeObj["activity_main.xml"] = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    android:layout_width=\"match_parent\"\n    android:layout_height=\"match_parent\"\n    android:orientation=\"vertical\">\n\n    <TextView\n        android:layout_width=\"wrap_content\"\n        android:layout_height=\"wrap_content\"\n        android:text=\"Hello World!\" />\n</LinearLayout>";
+                    }
+                    
+                    // Add basic manifest
+                    codeObj["AndroidManifest.xml"] = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    package=\"com.example.app\">\n\n    <application\n        android:allowBackup=\"true\"\n        android:icon=\"@mipmap/ic_launcher\"\n        android:label=\"@string/app_name\"\n        android:theme=\"@style/AppTheme\">\n        <activity android:name=\".MainActivity\">\n            <intent-filter>\n                <action android:name=\"android.intent.action.MAIN\" />\n                <category android:name=\"android.intent.category.LAUNCHER\" />\n            </intent-filter>\n        </activity>\n    </application>\n</manifest>";
+                }
+                
+                return codeObj;
+            } catch (e) {
+                console.error("Error extracting code:", e);
+                return {
+                    "MainActivity.java": "// Error extracting code\npublic class MainActivity extends AppCompatActivity {\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        setContentView(R.layout.activity_main);\n    }\n}"
+                };
+            }
+        }        
+
+        function checkForSavedData() {
+            fetch('/api/load-project')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success' && data.projects.length > 0) {
+                        document.getElementById('projectStatus').innerHTML = 
+                            `<div class="status info">
+                                <span>💾 ${data.projects.length} saved project(s) available</span>
+                            </div>`;
+                    }
+                })
+                .catch(error => console.error('Error checking for saved projects:', error));
+                
+            // Try to load saved API key
+            fetch('/api/load-project/config.json')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success' && data.projectData && data.projectData.api_key) {
+                        savedApiKey = data.projectData.api_key;
+                        document.getElementById('apiKey').value = savedApiKey;
+                        document.getElementById('apiStatus').innerHTML = 
+                            `<div class="status success">
+                                <span>✅ Saved API key loaded</span>
+                            </div>`;
+                    }
+                })
+                .catch(error => console.log('No saved API key found'));
+        }
+        
+        // Enhanced tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.card:nth-child(2) .tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.card:nth-child(2) .tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+        
+        function switchPreviewTab(tabName) {
+            document.querySelectorAll('.preview-section .tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.preview-section .tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }    
+    
+        // API key visibility toggle
+        function toggleApiKeyVisibility() {
+            const apiKeyInput = document.getElementById('apiKey');
+            const button = document.querySelector('.api-key-toggle');
+            
+            if (apiKeyInput.type === 'password') {
+                apiKeyInput.type = 'text';
+                button.textContent = '🙈';
+            } else {
+                apiKeyInput.type = 'password';
+                button.textContent = '👁️';
+            }
+        }
+        
+        // Load app templates
+        function loadTemplate(template) {
+            const templates = {
+                weather: {
+                    name: "WeatherApp",
+                    description: "A comprehensive weather application with current conditions, hourly forecasts, 7-day predictions, weather maps, and location-based services. Features beautiful animations, Material Design 3 UI, and offline support.",
+                    category: "weather"
+                },
+                todo: {
+                    name: "TaskMaster",
+                    description: "A feature-rich todo list application with task categories, due dates, reminders, recurring tasks, and progress tracking. Includes local storage, cloud sync, widgets, and dark mode support.",
+                    category: "productivity"
+                },
+                chat: {
+                    name: "ChatConnect",
+                    description: "A modern messaging application with real-time chat, user profiles, message status indicators, media sharing, and push notifications. Features a clean Material Design interface and offline message queueing.",
+                    category: "social"
+                },
+                fitness: {
+                    name: "FitTrack",
+                    description: "A comprehensive fitness tracking application with workout routines, exercise logging, progress charts, calorie counter, and achievement badges. Includes health metrics, reminders, and social sharing.",
+                    category: "health"
+                }
+            };
+            
+            if (templates[template]) {
+                document.getElementById('appName').value = templates[template].name;
+                document.getElementById('appDescription').value = templates[template].description;
+                document.getElementById('appCategory').value = templates[template].category;
+                
+                // Show a notification
+                document.getElementById('generationStatus').innerHTML = 
+                    `<div class="status info">
+                        <span>✅ ${templates[template].name} template loaded</span>
+                    </div>`;
+            }
+        }
+        
+        // Test Gemini API connection
+        function testGeminiAPI(saveKey = false) {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const testBtn = document.getElementById('testBtnText');
+            const statusDiv = document.getElementById('apiStatus');
+            
+            if (!apiKey) {
+                statusDiv.innerHTML = 
+                    `<div class="status error">
+                        <span>❌ Please enter your Gemini API key</span>
+                    </div>`;
+                return;
+            }
+            
+            // Update button state
+            testBtn.innerHTML = '<div class="loading"></div> Testing...';
+            statusDiv.innerHTML = '';
+            
+            // Test API connection
+            fetch('/api/test-gemini', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    api_key: apiKey,
+                    prompt: 'Say "API connection successful" if you can read this message.',
+                    save_key: saveKey
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    statusDiv.innerHTML = 
+                        `<div class="status success">
+                            <span>✅ ${data.message}</span>
+                        </div>`;
+                    
+                    // If save was requested, update the saved key
+                    if (saveKey) {
+                        savedApiKey = apiKey;
+                    }
+                } else {
+                    statusDiv.innerHTML = 
+                        `<div class="status error">
+                            <span>❌ ${data.message}</span>
+                        </div>`;
+                }
+            })
+            .catch(error => {
+                statusDiv.innerHTML = 
+                    `<div class="status error">
+                        <span>❌ Connection error: ${error.message}</span>
+                    </div>`;
+            })
+            .finally(() => {
+                testBtn.innerHTML = '🔧 Test API Connection';
+            });
+        } 
+       
+        // Generate Android app
+        function generateAndroidApp() {
+            const apiKey = document.getElementById('apiKey').value.trim() || savedApiKey;
+            const appName = document.getElementById('appName').value.trim();
+            const appDescription = document.getElementById('appDescription').value.trim();
+            const generateBtn = document.getElementById('generateBtnText');
+            const progressDiv = document.getElementById('generationProgress');
+            const statusDiv = document.getElementById('generationStatus');
+            const progressFill = document.getElementById('progressFill');
+            
+            if (!apiKey) {
+                statusDiv.innerHTML = 
+                    `<div class="status error">
+                        <span>❌ Please enter your Gemini API key</span>
+                    </div>`;
+                return;
+            }
+            
+            if (!appName || !appDescription) {
+                statusDiv.innerHTML = 
+                    `<div class="status error">
+                        <span>❌ Please enter app name and description</span>
+                    </div>`;
+                return;
+            }
+            
+            // Update UI state
+            generateBtn.innerHTML = '<div class="loading"></div> Generating...';
+            progressDiv.style.display = 'block';
+            statusDiv.innerHTML = '';
+            
+            // Simulate progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 90) progress = 90;
+                progressFill.style.width = `${progress}%`;
+            }, 500);
+            
+            // Generate app code
+            fetch('/api/generate-android-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    api_key: apiKey,
+                    appName: appName,
+                    description: appDescription
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                
+                if (data.status === 'success') {
+                    // Store generated code
+                    generatedCode = data.code;
+                    currentAppData = {
+                        appName: appName,
+                        description: appDescription,
+                        code: data.code,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    // Update code display
+                    document.getElementById('codeOutput').textContent = data.code;
+                    
+                    // Update preview
+                    updateAppPreview(appName, appDescription);
+                    
+                    statusDiv.innerHTML = 
+                        `<div class="status success">
+                            <span>✅ App generated successfully! Check the preview and code tabs.</span>
+                        </div>`;
+                } else {
+                    statusDiv.innerHTML = 
+                        `<div class="status error">
+                            <span>❌ ${data.message}</span>
+                        </div>`;
+                }
+            })
+            .catch(error => {
+                clearInterval(progressInterval);
+                statusDiv.innerHTML = 
+                    `<div class="status error">
+                        <span>❌ Generation error: ${error.message}</span>
+                    </div>`;
+            })
+            .finally(() => {
+                generateBtn.innerHTML = '🎯 Generate Android App';
+                setTimeout(() => {
+                    progressDiv.style.display = 'none';
+                }, 1000);
+            });
+        }
+        
+        // Update app preview
+        function updateAppPreview(appName, appDescription) {
+            const phoneScreen = document.getElementById('phoneScreen');
+            
+            // Create a simple app preview based on the description
+            const previewHTML = `
+                <div style="height: 100%;">
+                    <!-- App Bar -->
+                    <div style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 15px; border-radius: 15px 15px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 18px;">≡</span>
+                            <span style="font-weight: bold;">${appName}</span>
+                        </div>
+                        <div>⋮</div>
+                    </div>
+                    
+                    <!-- App Content -->
+                    <div style="padding: 15px; height: calc(100% - 120px); overflow-y: auto;">
+                        ${generatePreviewContent(appName, appDescription)}
+                    </div>
+                    
+                    <!-- Bottom Navigation -->
+                    <div style="background: white; border-top: 1px solid #eee; padding: 10px; display: flex; justify-content: space-around; position: absolute; bottom: 0; width: 100%; left: 0; border-radius: 0 0 15px 15px;">
+                        <div style="text-align: center; color: var(--primary);">
+                            <div style="font-size: 20px;">🏠</div>
+                            <div style="font-size: 12px;">Home</div>
+                        </div>
+                        <div style="text-align: center; color: #999;">
+                            <div style="font-size: 20px;">🔍</div>
+                            <div style="font-size: 12px;">Search</div>
+                        </div>
+                        <div style="text-align: center; color: #999;">
+                            <div style="font-size: 20px;">⚙️</div>
+                            <div style="font-size: 12px;">Settings</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            phoneScreen.innerHTML = previewHTML;
+        }     
+   
+        // Generate preview content based on app description
+        function generatePreviewContent(appName, description) {
+            // Check for app types in the description
+            if (description.toLowerCase().includes('weather')) {
+                return `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 40px; margin-bottom: 10px;">☀️</div>
+                        <div style="font-size: 36px; font-weight: bold;">72°F</div>
+                        <div style="color: #666; margin-bottom: 15px;">Sunny</div>
+                        <div style="font-size: 14px; color: #666;">New York City, NY</div>
+                    </div>
+                    
+                    <div style="background: rgba(102, 126, 234, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 20px;">
+                        <div style="margin-bottom: 10px; font-weight: bold;">Hourly Forecast</div>
+                        <div style="display: flex; overflow-x: auto; gap: 15px; padding-bottom: 5px;">
+                            <div style="text-align: center; min-width: 50px;">
+                                <div>Now</div>
+                                <div style="font-size: 20px; margin: 5px 0;">☀️</div>
+                                <div>72°</div>
+                            </div>
+                            <div style="text-align: center; min-width: 50px;">
+                                <div>1PM</div>
+                                <div style="font-size: 20px; margin: 5px 0;">☀️</div>
+                                <div>74°</div>
+                            </div>
+                            <div style="text-align: center; min-width: 50px;">
+                                <div>2PM</div>
+                                <div style="font-size: 20px; margin: 5px 0;">⛅</div>
+                                <div>73°</div>
+                            </div>
+                            <div style="text-align: center; min-width: 50px;">
+                                <div>3PM</div>
+                                <div style="font-size: 20px; margin: 5px 0;">⛅</div>
+                                <div>72°</div>
+                            </div>
+                            <div style="text-align: center; min-width: 50px;">
+                                <div>4PM</div>
+                                <div style="font-size: 20px; margin: 5px 0;">☁️</div>
+                                <div>70°</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(102, 126, 234, 0.1); border-radius: 15px; padding: 15px;">
+                        <div style="margin-bottom: 10px; font-weight: bold;">7-Day Forecast</div>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>Today</div>
+                                <div style="font-size: 20px;">☀️</div>
+                                <div>68° / 75°</div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>Mon</div>
+                                <div style="font-size: 20px;">⛅</div>
+                                <div>65° / 72°</div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>Tue</div>
+                                <div style="font-size: 20px;">🌧️</div>
+                                <div>60° / 68°</div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>Wed</div>
+                                <div style="font-size: 20px;">⛈️</div>
+                                <div>58° / 65°</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (description.toLowerCase().includes('todo') || description.toLowerCase().includes('task')) {
+                return `
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-weight: bold; margin-bottom: 10px;">Today's Tasks</div>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                <input type="checkbox" checked>
+                                <span style="text-decoration: line-through; color: #999;">Morning meeting with team</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                <input type="checkbox">
+                                <span>Complete project proposal</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                <input type="checkbox">
+                                <span>Review client feedback</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                <input type="checkbox">
+                                <span>Send weekly report</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-weight: bold; margin-bottom: 10px;">Tomorrow</div>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                <input type="checkbox">
+                                <span>Client presentation</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                <input type="checkbox">
+                                <span>Team lunch</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button style="background: var(--primary); color: white; border: none; padding: 15px; border-radius: 50%; width: 60px; height: 60px; font-size: 24px; position: absolute; bottom: 80px; right: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">+</button>
+                `;
+            } else {
+                // Generic app preview
+                return `
+                    <div style="text-align: center; margin: 20px 0;">
+                        <div style="font-size: 60px; margin-bottom: 20px;">🚀</div>
+                        <h2 style="margin-bottom: 10px;">${appName}</h2>
+                        <p style="color: #666; margin-bottom: 30px;">Your new Android app is ready!</p>
+                        
+                        <div style="background: var(--primary); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                            Get Started
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <div style="font-weight: bold; margin-bottom: 10px;">Features</div>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                <div style="width: 30px; height: 30px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">1</div>
+                                <span>Modern Material Design UI</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                <div style="width: 30px; height: 30px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">2</div>
+                                <span>Smooth animations</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                <div style="width: 30px; height: 30px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">3</div>
+                                <span>Offline support</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        } 
+       
+        // Export project as ZIP
+        function exportProject() {
+            if (!currentAppData) {
+                document.getElementById('exportStatus').innerHTML = 
+                    `<div class="status error">
+                        <span>❌ Please generate an app first</span>
+                    </div>`;
+                return;
+            }
+            
+            const exportBtn = document.getElementById('exportBtnText');
+            exportBtn.innerHTML = '<div class="loading"></div> Exporting...';
+            
+            // Process the code string to extract file content
+            let codeObj = {};
+            try {
+                // Try to parse if it's already JSON
+                codeObj = typeof currentAppData.code === 'string' ? 
+                    extractCodeFromString(currentAppData.code) : 
+                    currentAppData.code;
+            } catch (e) {
+                console.error("Error processing code:", e);
+                codeObj = { 
+                    "MainActivity.java": "// Error parsing code\n// Using placeholder\npublic class MainActivity extends AppCompatActivity {\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        setContentView(R.layout.activity_main);\n    }\n}" 
+                };
+            }
+            
+            fetch('/api/export-project', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    appName: currentAppData.appName,
+                    code: codeObj
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                }
+                throw new Error('Export failed');
+            })
+            .then(blob => {
+                // Create download link
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `${currentAppData.appName}_project.zip`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                document.getElementById('exportStatus').innerHTML = 
+                    `<div class="status success">
+                        <span>✅ Project exported successfully</span>
+                    </div>`;
+            })
+            .catch(error => {
+                document.getElementById('exportStatus').innerHTML = 
+                    `<div class="status error">
+                        <span>❌ Export error: ${error.message}</span>
+                    </div>`;
+            })
+            .finally(() => {
+                exportBtn.innerHTML = '💾 Download Project ZIP';
+            });
+        }
+        
+        // Build APK
+        function buildAPK() {
+            if (!currentAppData) {
+                document.getElementById('exportStatus').innerHTML = 
+                    `<div class="status error">
+                        <span>❌ Please generate an app first</span>
+                    </div>`;
+                return;
+            }
+            
+            const buildBtn = document.getElementById('buildBtnText');
+            buildBtn.innerHTML = '<div class="loading"></div> Building...';
+            
+            fetch('/api/build-apk', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    appName: currentAppData.appName
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                }
+                throw new Error('Build failed');
+            })
+            .then(blob => {
+                // Create download link
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `${currentAppData.appName}_demo.apk`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                document.getElementById('exportStatus').innerHTML = 
+                    `<div class="status success">
+                        <span>✅ APK built successfully</span>
+                    </div>`;
+            })
+            .catch(error => {
+                document.getElementById('exportStatus').innerHTML = 
+                    `<div class="status error">
+                        <span>❌ Build error: ${error.message}</span>
+                    </div>`;
+            })
+            .finally(() => {
+                buildBtn.innerHTML = '🔨 Build APK (Demo)';
+            });
+        }
+        
+        // Show signing options
+        function signAPK() {
+            if (!currentAppData) {
+                document.getElementById('exportStatus').innerHTML = 
+                    `<div class="status error">
+                        <span>❌ Please generate an app first</span>
+                    </div>`;
+                return;
+            }
+            
+            const signingOptions = document.getElementById('signingOptions');
+            signingOptions.style.display = signingOptions.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Sign and download APK
+        function signAndDownloadAPK() {
+            if (!currentAppData) {
+                document.getElementById('exportStatus').innerHTML = 
+                    `<div class="status error">
+                        <span>❌ Please generate an app first</span>
+                    </div>`;
+                return;
+            }
+            
+            const keystorePassword = document.getElementById('keystorePassword').value;
+            const keyAlias = document.getElementById('keyAlias').value;
+            
+            document.getElementById('exportStatus').innerHTML = 
+                `<div class="status info">
+                    <span><div class="loading"></div> Signing APK...</span>
+                </div>`;
+            
+            fetch('/api/sign-apk', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    appName: currentAppData.appName,
+                    keystorePassword: keystorePassword,
+                    keyAlias: keyAlias
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                }
+                throw new Error('Signing failed');
+            })
+            .then(blob => {
+                // Create download link
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `${currentAppData.appName}_signed.apk`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                document.getElementById('exportStatus').innerHTML = 
+                    `<div class="status success">
+                        <span>✅ APK signed and downloaded successfully</span>
+                    </div>`;
+            })
+            .catch(error => {
+                document.getElementById('exportStatus').innerHTML = 
+                    `<div class="status error">
+                        <span>❌ Signing error: ${error.message}</span>
+                    </div>`;
+            });
+        } 
+       
+        // Export to GitHub (placeholder)
+        function exportToGitHub() {
+            document.getElementById('exportStatus').innerHTML = 
+                `<div class="status info">
+                    <span>ℹ️ GitHub export feature coming soon</span>
+                </div>`;
+        }
+        
+        // Open in Android Studio (placeholder)
+        function openInAndroidStudio() {
+            document.getElementById('exportStatus').innerHTML = 
+                `<div class="status info">
+                    <span>ℹ️ Android Studio integration coming soon</span>
+                </div>`;
+        }
+        
+        // Show AI Assistant (placeholder)
+        function showAIAssistant() {
+            alert('AI Assistant: How can I help you with your Android app?');
+        }
+        
+        // Save project
+        function saveProject() {
+            if (!currentAppData) {
+                document.getElementById('projectStatus').innerHTML = 
+                    `<div class="status error">
+                        <span>❌ Please generate an app first</span>
+                    </div>`;
+                return;
+            }
+            
+            document.getElementById('projectStatus').innerHTML = 
+                `<div class="status info">
+                    <span><div class="loading"></div> Saving project...</span>
+                </div>`;
+            
+            fetch('/api/save-project', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    appName: currentAppData.appName,
+                    projectData: currentAppData
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('projectStatus').innerHTML = 
+                        `<div class="status success">
+                            <span>✅ ${data.message}</span>
+                        </div>`;
+                } else {
+                    document.getElementById('projectStatus').innerHTML = 
+                        `<div class="status error">
+                            <span>❌ ${data.message}</span>
+                        </div>`;
+                }
+            })
+            .catch(error => {
+                document.getElementById('projectStatus').innerHTML = 
+                    `<div class="status error">
+                        <span>❌ Save error: ${error.message}</span>
+                    </div>`;
+            });
+        }
+        
+        // Load project list
+        function loadProjectList() {
+            document.getElementById('projectStatus').innerHTML = 
+                `<div class="status info">
+                    <span><div class="loading"></div> Loading projects...</span>
+                </div>`;
+            
+            fetch('/api/load-project')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success' && data.projects.length > 0) {
+                        const projectListDiv = document.getElementById('projectList');
+                        projectListDiv.style.display = 'block';
+                        projectListDiv.innerHTML = '<div class="project-list">' + 
+                            data.projects.map(project => `
+                                <div class="project-item" onclick="loadSpecificProject('${project.filename}')">
+                                    <h4>${project.name}</h4>
+                                    <p>Last modified: ${new Date(project.date).toLocaleString()}</p>
+                                </div>
+                            `).join('') + 
+                            '</div>';
+                            
+                        document.getElementById('projectStatus').innerHTML = 
+                            `<div class="status success">
+                                <span>✅ Found ${data.projects.length} project(s)</span>
+                            </div>`;
+                    } else {
+                        document.getElementById('projectList').style.display = 'none';
+                        document.getElementById('projectStatus').innerHTML = 
+                            `<div class="status info">
+                                <span>ℹ️ No saved projects found</span>
+                            </div>`;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('projectStatus').innerHTML = 
+                        `<div class="status error">
+                            <span>❌ Load error: ${error.message}</span>
+                        </div>`;
+                });
+        }
+        
+        // Load specific project
+        function loadSpecificProject(filename) {
+            document.getElementById('projectStatus').innerHTML = 
+                `<div class="status info">
+                    <span><div class="loading"></div> Loading project...</span>
+                </div>`;
+            
+            fetch(`/api/load-project/${filename}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Load project data
+                        currentAppData = data.projectData;
+                        
+                        // Update UI
+                        document.getElementById('appName').value = currentAppData.appName;
+                        document.getElementById('appDescription').value = currentAppData.description;
+                        document.getElementById('codeOutput').textContent = currentAppData.code;
+                        
+                        // Update preview
+                        updateAppPreview(currentAppData.appName, currentAppData.description);
+                        
+                        // Hide project list
+                        document.getElementById('projectList').style.display = 'none';
+                        
+                        document.getElementById('projectStatus').innerHTML = 
+                            `<div class="status success">
+                                <span>✅ Project loaded successfully</span>
+                            </div>`;
+                    } else {
+                        document.getElementById('projectStatus').innerHTML = 
+                            `<div class="status error">
+                                <span>❌ ${data.message}</span>
+                            </div>`;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('projectStatus').innerHTML = 
+                        `<div class="status error">
+                            <span>❌ Load error: ${error.message}</span>
+                        </div>`;
+                });
+        }
+    </script>
+</body>
+</html>
