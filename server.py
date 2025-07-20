@@ -262,15 +262,26 @@ dependencies {{
 
             # Create root level build.gradle
             root_build_gradle = '''// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {{
+    repositories {{
+        google()
+        mavenCentral()
+    }}
+    dependencies {{
+        classpath 'com.android.tools.build:gradle:7.4.2'
+    }}
+}}
+
 plugins {{
-    id 'com.android.application' version '8.1.4' apply false
-    id 'com.android.library' version '8.1.4' apply false
+    id 'com.android.application' version '7.4.2' apply false
+    id 'com.android.library' version '7.4.2' apply false
 }}
 
 allprojects {{
     repositories {{
         google()
         mavenCentral()
+        jcenter() // Warning: this repository is going to shut down soon
     }}
 }}
 
@@ -567,7 +578,7 @@ if "%OS%"=="Windows_NT" endlocal
             # Gradle wrapper
             zf.writestr(f'{app_name}/gradle/wrapper/gradle-wrapper.properties', '''distributionBase=GRADLE_USER_HOME
 distributionPath=wrapper/dists
-distributionUrl=https\\://services.gradle.org/distributions/gradle-8.0-all.zip
+distributionUrl=https\\://services.gradle.org/distributions/gradle-7.6.1-all.zip
 zipStoreBase=GRADLE_USER_HOME
 zipStorePath=wrapper/dists''')
             zf.writestr(f'{app_name}/gradle/wrapper/gradle-wrapper.jar', gradle_wrapper_jar)
