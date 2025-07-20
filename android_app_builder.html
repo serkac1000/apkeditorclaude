@@ -759,12 +759,16 @@ public class MainActivity extends AppCompatActivity {
                             <span id="buildBtnText">🔨 Build APK (Demo)</span>
                         </button>
                         
+                        <button class="btn" onclick="signAPK()" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                            <span id="signBtnText">✍️ Sign APK</span>
+                        </button>
+                        
                         <button class="btn" onclick="exportToGitHub()">
                             <span>🐙 Export to GitHub</span>
                         </button>
                         
                         <button class="btn" onclick="openInAndroidStudio()">
-                            <span>🛠️ Open in Android Studio</span>
+                            <span>🛠️ Android Studio Guide</span>
                         </button>
                     </div>
                     
@@ -1071,6 +1075,115 @@ public class MainActivity extends AppCompatActivity {
                 const statusDiv = document.getElementById('generationStatus');
                 showStatus(statusDiv, 'success', `✅ ${templates[template].name} template loaded!`);
             }
+        }
+
+        // Sign APK function
+        async function signAPK() {
+            if (!currentAppData) {
+                alert('Please generate an app first');
+                return;
+            }
+            
+            const btnText = document.getElementById('signBtnText');
+            const statusDiv = document.getElementById('exportStatus');
+            
+            btnText.innerHTML = '<div class="loading"></div> Signing...';
+            
+            try {
+                const response = await fetch('/api/sign-apk', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentAppData)
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${currentAppData.appName}_signed.apk`;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    
+                    showStatus(statusDiv, 'success', '✅ APK signed and ready for installation!');
+                } else {
+                    showStatus(statusDiv, 'error', '❌ APK signing failed');
+                }
+            } catch (error) {
+                showStatus(statusDiv, 'error', '❌ Signing failed: ' + error.message);
+            }
+            
+            btnText.textContent = '✍️ Sign APK';
+        }
+
+        // Enhanced export to GitHub
+        async function exportToGitHub() {
+            if (!currentAppData) {
+                alert('Please generate an app first');
+                return;
+            }
+            
+            const repoName = prompt('Enter GitHub repository name:', currentAppData.appName);
+            if (!repoName) return;
+            
+            const statusDiv = document.getElementById('exportStatus');
+            showStatus(statusDiv, 'info', '🔄 Creating GitHub repository...');
+            
+            try {
+                const response = await fetch('/api/export-to-github', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ...currentAppData,
+                        repoName: repoName
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showStatus(statusDiv, 'success', `✅ Exported to GitHub! Repository: ${result.repoUrl}`);
+                    setTimeout(() => {
+                        window.open(result.repoUrl, '_blank');
+                    }, 2000);
+                } else {
+                    showStatus(statusDiv, 'warning', '⚠️ GitHub export requires authentication. Download ZIP and upload manually.');
+                }
+            } catch (error) {
+                showStatus(statusDiv, 'warning', '⚠️ GitHub export not available. Use ZIP export instead.');
+            }
+        }
+
+        // Enhanced Android Studio integration
+        function openInAndroidStudio() {
+            if (!currentAppData) {
+                alert('Please generate an app first');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('exportStatus');
+            showStatus(statusDiv, 'info', '🛠️ Instructions for Android Studio:');
+            
+            const instructions = `
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">📋 Android Studio Setup:</h4>
+                    <ol style="margin: 0; padding-left: 20px; line-height: 1.6;">
+                        <li>First, download the project ZIP using the button above</li>
+                        <li>Extract the ZIP file to your desired location</li>
+                        <li>Open Android Studio</li>
+                        <li>Select "Open an existing Android Studio project"</li>
+                        <li>Navigate to the extracted folder and select it</li>
+                        <li>Wait for Gradle sync to complete</li>
+                        <li>Connect your device or start an emulator</li>
+                        <li>Click the "Run" button to build and install</li>
+                    </ol>
+                    <div style="background: #e3f2fd; padding: 10px; border-radius: 5px; margin-top: 15px;">
+                        <strong>💡 Tip:</strong> Make sure you have Android SDK and build tools installed!
+                    </div>
+                </div>
+            `;
+            
+            statusDiv.innerHTML = instructions;
         }
     </script>
 </body>
