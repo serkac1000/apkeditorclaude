@@ -2,7 +2,7 @@
 echo ===============================================
 echo    Android App Builder Server Startup
 echo ===============================================
-echo Starting server on 127.0.0.1:5000...
+echo Starting server on 127.0.0.1:5001...
 echo.
 
 REM Check if Python is installed
@@ -37,7 +37,11 @@ if not exist "server.py" (
 )
 
 REM Check if HTML file exists
-if exist "android_app_builder.html" (
+if exist "android_app_builder_updated.html" (
+    echo Updated HTML file found - using enhanced version!
+    copy /y "android_app_builder_updated.html" "android_app_builder.html" >nul
+    echo HTML file updated successfully.
+) else if exist "android_app_builder.html" (
     echo HTML file found - server ready!
 ) else (
     echo WARNING: android_app_builder.html not found!
@@ -53,7 +57,7 @@ echo ===============================================
 
 REM Start the server
 echo Starting Python Flask server...
-start "" http://127.0.0.1:5000
+start "" http://127.0.0.1:5001
 python server.py
 
 REM If server stops, pause to see any error messages
