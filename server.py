@@ -205,10 +205,13 @@ public class MainActivity extends AppCompatActivity {{
 </manifest>'''
 
             # Create build.gradle
-            build_gradle = f'''apply plugin: 'com.android.application'
+            build_gradle = f'''plugins {{
+    id 'com.android.application'
+}}
 
 android {{
-    compileSdkVersion 34
+    namespace 'com.example.{app_name.lower()}'
+    compileSdk 34
     
     defaultConfig {{
         applicationId "com.example.{app_name.lower()}"
@@ -216,20 +219,31 @@ android {{
         targetSdkVersion 34
         versionCode 1
         versionName "1.0"
+        
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }}
     
     buildTypes {{
         release {{
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }}
+    }}
+    
+    compileOptions {{
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }}
 }}
 
 dependencies {{
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.google.android.material:material:1.10.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }}'''
 
             # Create strings.xml
@@ -247,26 +261,22 @@ dependencies {{
 </resources>'''
 
             # Create root level build.gradle
-            root_build_gradle = '''buildscript {
-    repositories {
+            root_build_gradle = '''// Top-level build file where you can add configuration options common to all sub-projects/modules.
+plugins {{
+    id 'com.android.application' version '8.1.4' apply false
+    id 'com.android.library' version '8.1.4' apply false
+}}
+
+allprojects {{
+    repositories {{
         google()
         mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.0'
-    }
-}
+    }}
+}}
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-task clean(type: Delete) {
+task clean(type: Delete) {{
     delete rootProject.buildDir
-}'''
+}}'''
 
             # Create settings.gradle
             settings_gradle = f'''include ':app'
