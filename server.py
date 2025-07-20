@@ -133,27 +133,132 @@ def export_project():
         # Create a zip file with Android project structure
         memory_file = BytesIO()
         with zipfile.ZipFile(memory_file, 'w') as zf:
-            # Create basic Android project structure
-            zf.writestr(f'{app_name}/app/src/main/java/com/example/{app_name.lower()}/MainActivity.java', 
-                       generated_code.get('MainActivity.java', '// MainActivity code here'))
+            # Create main activity
+            main_activity = f'''package com.example.{app_name.lower()};
+
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {{
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {{
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        
+        TextView titleText = findViewById(R.id.titleText);
+        titleText.setText("{app_name}");
+    }}
+}}
+
+/* Generated Code:
+{generated_code}
+*/'''
             
-            zf.writestr(f'{app_name}/app/src/main/res/layout/activity_main.xml',
-                       generated_code.get('activity_main.xml', '<!-- Layout XML here -->'))
+            # Create layout XML
+            layout_xml = f'''<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="{app_name}"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome to your AI-generated app!"
+        android:textSize="16sp"
+        android:gravity="center" />
+
+</LinearLayout>'''
             
-            zf.writestr(f'{app_name}/app/src/main/AndroidManifest.xml',
-                       generated_code.get('AndroidManifest.xml', '<!-- Manifest XML here -->'))
-            
-            zf.writestr(f'{app_name}/app/build.gradle',
-                       generated_code.get('build.gradle', '// Build gradle here'))
-            
-            zf.writestr(f'{app_name}/app/src/main/res/values/strings.xml',
-                       generated_code.get('strings.xml', '<!-- Strings XML here -->'))
-            
-            zf.writestr(f'{app_name}/app/src/main/res/values/colors.xml',
-                       generated_code.get('colors.xml', '<!-- Colors XML here -->'))
-            
-            # Add README
-            zf.writestr(f'{app_name}/README.md', f'# {app_name}\n\nGenerated Android Studio project.')
+            # Create manifest
+            manifest_xml = f'''<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.{app_name.lower()}">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+        
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>'''
+
+            # Create build.gradle
+            build_gradle = f'''apply plugin: 'com.android.application'
+
+android {{
+    compileSdkVersion 34
+    
+    defaultConfig {{
+        applicationId "com.example.{app_name.lower()}"
+        minSdkVersion 21
+        targetSdkVersion 34
+        versionCode 1
+        versionName "1.0"
+    }}
+    
+    buildTypes {{
+        release {{
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }}
+    }}
+}}
+
+dependencies {{
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+}}'''
+
+            # Create strings.xml
+            strings_xml = f'''<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">{app_name}</string>
+</resources>'''
+
+            # Create colors.xml
+            colors_xml = '''<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+</resources>'''
+
+            # Write all files to ZIP
+            zf.writestr(f'{app_name}/app/src/main/java/com/example/{app_name.lower()}/MainActivity.java', main_activity)
+            zf.writestr(f'{app_name}/app/src/main/res/layout/activity_main.xml', layout_xml)
+            zf.writestr(f'{app_name}/app/src/main/AndroidManifest.xml', manifest_xml)
+            zf.writestr(f'{app_name}/app/build.gradle', build_gradle)
+            zf.writestr(f'{app_name}/app/src/main/res/values/strings.xml', strings_xml)
+            zf.writestr(f'{app_name}/app/src/main/res/values/colors.xml', colors_xml)
+            zf.writestr(f'{app_name}/README.md', f'# {app_name}\n\nAI-Generated Android Studio project.\n\n## Setup\n1. Open in Android Studio\n2. Sync project with Gradle files\n3. Run on device or emulator')
+            zf.writestr(f'{app_name}/gradle/wrapper/gradle-wrapper.properties', '''distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\\://services.gradle.org/distributions/gradle-8.0-all.zip
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists''')
         
         memory_file.seek(0)
         
