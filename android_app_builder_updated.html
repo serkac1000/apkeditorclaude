@@ -830,8 +830,12 @@ public class MainActivity extends AppCompatActivity {
                             <span>🔐 Sign APK</span>
                         </button>
                         
-                        <button class="btn" onclick="exportToGitHub()">
-                            <span>🐙 Export to GitHub</span>
+                        <button class="btn" onclick="showGithubModal()">
+                            <span>📥 Import from GitHub</span>
+                        </button>
+                        
+                        <button class="btn" onclick="prepareForAndroidStudio()">
+                            <span>🛠️ Prepare for Android Studio</span>
                         </button>
                     </div>
                     
@@ -970,11 +974,11 @@ public class MainActivity extends AppCompatActivity {
                 .catch(error => console.error('Error checking for saved projects:', error));
                 
             // Try to load saved API key
-            fetch('/api/load-project/config.json')
+            fetch('/api/load-api-key')
                 .then(response => response.json())
                 .then(data => {
-                    if (data.status === 'success' && data.projectData && data.projectData.api_key) {
-                        savedApiKey = data.projectData.api_key;
+                    if (data.status === 'success' && data.api_key) {
+                        savedApiKey = data.api_key;
                         document.getElementById('apiKey').value = savedApiKey;
                         document.getElementById('apiStatus').innerHTML = 
                             `<div class="status success">
@@ -1750,4 +1754,166 @@ public class MainActivity extends AppCompatActivity {
         }
     </script>
 </body>
-</html>
+</html><!-- Gi
+tHub Import Modal -->
+<div id="githubImportModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color: white; margin: 15% auto; padding: 20px; border-radius: 10px; width: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+        <span class="close" onclick="closeGithubModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        <h2>Import from GitHub</h2>
+        <div class="form-group">
+            <label for="githubUrl">GitHub Repository URL:</label>
+            <input type="text" id="githubUrl" placeholder="https://github.com/username/repository">
+        </div>
+        <div class="form-group">
+            <label for="githubBranch">Branch (optional):</label>
+            <input type="text" id="githubBranch" placeholder="main" value="main">
+        </div>
+        <button class="btn btn-success" onclick="importFromGithub()">Import Repository</button>
+        <div id="githubImportStatus"></div>
+    </div>
+</div>
+
+<script>
+// GitHub Import Functions
+function showGithubModal() {
+    document.getElementById('githubImportModal').style.display = 'block';
+}
+
+function closeGithubModal() {
+    document.getElementById('githubImportModal').style.display = 'none';
+}
+
+function importFromGithub() {
+    const githubUrl = document.getElementById('githubUrl').value.trim();
+    const branch = document.getElementById('githubBranch').value.trim() || 'main';
+    const statusDiv = document.getElementById('githubImportStatus');
+    
+    if (!githubUrl) {
+        statusDiv.innerHTML = 
+            `<div class="status error">
+                <span>❌ Please enter a GitHub repository URL</span>
+            </div>`;
+        return;
+    }
+    
+    statusDiv.innerHTML = 
+        `<div class="status info">
+            <span><div class="loading"></div> Importing from GitHub...</span>
+        </div>`;
+    
+    fetch('/api/import-from-github', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            github_url: githubUrl,
+            branch: branch
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.blob();
+        }
+        return response.json().then(data => {
+            throw new Error(data.message || 'Failed to import from GitHub');
+        });
+    })
+    .then(blob => {
+        // Create download link
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'github_project.zip';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        
+        statusDiv.innerHTML = 
+            `<div class="status success">
+                <span>✅ Repository imported successfully</span>
+            </div>`;
+            
+        // Close modal after a delay
+        setTimeout(() => {
+            closeGithubModal();
+        }, 2000);
+    })
+    .catch(error => {
+        statusDiv.innerHTML = 
+            `<div class="status error">
+                <span>❌ Import error: ${error.message}</span>
+            </div>`;
+    });
+}
+
+// Function to prepare project for Android Studio
+function prepareForAndroidStudio() {
+    if (!currentAppData) {
+        document.getElementById('exportStatus').innerHTML = 
+            `<div class="status error">
+                <span>❌ Please generate an app first</span>
+            </div>`;
+        return;
+    }
+    
+    document.getElementById('exportStatus').innerHTML = 
+        `<div class="status info">
+            <span><div class="loading"></div> Preparing for Android Studio...</span>
+        </div>`;
+    
+    // Process the code string to extract file content
+    let projectFiles = {};
+    try {
+        // Try to parse if it's already JSON
+        projectFiles = typeof currentAppData.code === 'string' ? 
+            extractCodeFromString(currentAppData.code) : 
+            currentAppData.code;
+    } catch (e) {
+        console.error("Error processing code:", e);
+        projectFiles = { 
+            "MainActivity.java": "// Error parsing code\n// Using placeholder\npublic class MainActivity extends AppCompatActivity {\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        setContentView(R.layout.activity_main);\n    }\n}" 
+        };
+    }
+    
+    fetch('/api/prepare-for-android-studio', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            appName: currentAppData.appName,
+            project_files: projectFiles
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.blob();
+        }
+        throw new Error('Failed to prepare for Android Studio');
+    })
+    .then(blob => {
+        // Create download link
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `${currentAppData.appName}_android_studio_project.zip`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        
+        document.getElementById('exportStatus').innerHTML = 
+            `<div class="status success">
+                <span>✅ Project prepared for Android Studio successfully</span>
+            </div>`;
+    })
+    .catch(error => {
+        document.getElementById('exportStatus').innerHTML = 
+            `<div class="status error">
+                <span>❌ Error: ${error.message}</span>
+            </div>`;
+    });
+}
+</script>
