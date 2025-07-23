@@ -1,0 +1,20 @@
+modules = ["python-3.12", "web", "nodejs-20"]
+
+[nix]
+channel = "stable-24_05"
+
+[workflows]
+runButton = "Start Android App Builder"
+
+[[workflows.workflow]]
+name = "Start Android App Builder"
+author = 45017824
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python server.py"
+
+[[ports]]
+localPort = 5000
+externalPort = 80

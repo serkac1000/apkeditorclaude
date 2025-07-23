@@ -826,6 +826,7 @@ public class MainActivity extends AppCompatActivity {
                             <span id="buildBtnText">🔨 Build APK (Demo)</span>
                         </button>
                         
+<<<<<<< HEAD
                         <button class="btn" onclick="signAPK()">
                             <span>🔐 Sign APK</span>
                         </button>
@@ -855,6 +856,18 @@ public class MainActivity extends AppCompatActivity {
                         
                         <button class="btn btn-success" onclick="signAndDownloadAPK()">
                             <span>🔐 Sign and Download APK</span>
+=======
+                        <button class="btn" onclick="signAPK()" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                            <span id="signBtnText">✍️ Sign APK</span>
+                        </button>
+                        
+                        <button class="btn" onclick="exportToGitHub()">
+                            <span>🐙 Export to GitHub</span>
+                        </button>
+                        
+                        <button class="btn" onclick="openInAndroidStudio()">
+                            <span>🛠️ Android Studio Guide</span>
+>>>>>>> 081c6355387854342756229a48279465ee740f71
                         </button>
                     </div>
                     
@@ -1020,11 +1033,226 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         
+        // Test Gemini API connection
+        async function testGeminiAPI() {
+            const apiKey = document.getElementById('apiKey').value;
+            const statusDiv = document.getElementById('apiStatus');
+            const btnText = document.getElementById('testBtnText');
+            
+            if (!apiKey) {
+                showStatus(statusDiv, 'error', 'Please enter your Gemini API key');
+                return;
+            }
+            
+            btnText.innerHTML = '<div class="loading"></div> Testing...';
+            
+            try {
+                const response = await fetch('/api/test-gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        api_key: apiKey,
+                        prompt: 'Hello, please respond with "API connection successful" if you can read this.'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showStatus(statusDiv, 'success', '✅ API connection successful!');
+                } else {
+                    showStatus(statusDiv, 'error', '❌ ' + result.message);
+                }
+            } catch (error) {
+                showStatus(statusDiv, 'error', '❌ Connection failed: ' + error.message);
+            }
+            
+            btnText.textContent = '🔧 Test API Connection';
+        }
+        
+        // Generate Android App
+        async function generateAndroidApp() {
+            const apiKey = document.getElementById('apiKey').value;
+            const appName = document.getElementById('appName').value;
+            const appDescription = document.getElementById('appDescription').value;
+            const statusDiv = document.getElementById('generationStatus');
+            const progressDiv = document.getElementById('generationProgress');
+            const btnText = document.getElementById('generateBtnText');
+            
+            if (!apiKey) {
+                showStatus(statusDiv, 'error', 'Please enter your Gemini API key first');
+                return;
+            }
+            
+            progressDiv.style.display = 'block';
+            btnText.innerHTML = '<div class="loading"></div> Generating...';
+            
+            // Simulate progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress > 90) progress = 90;
+                document.getElementById('progressFill').style.width = progress + '%';
+            }, 500);
+            
+            try {
+                const response = await fetch('/api/generate-android-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        api_key: apiKey,
+                        appName: appName,
+                        description: appDescription
+                    })
+                });
+                
+                const result = await response.json();
+                clearInterval(progressInterval);
+                document.getElementById('progressFill').style.width = '100%';
+                
+                if (result.status === 'success') {
+                    showStatus(statusDiv, 'success', '✅ Android app generated successfully!');
+                    document.getElementById('codeOutput').textContent = result.code;
+                    currentAppData = { appName, code: result.code };
+                    
+                    // Update preview
+                    updatePreview(appName, appDescription);
+                    
+                    setTimeout(() => {
+                        progressDiv.style.display = 'none';
+                        document.getElementById('progressFill').style.width = '0%';
+                    }, 2000);
+                } else {
+                    showStatus(statusDiv, 'error', '❌ ' + result.message);
+                }
+            } catch (error) {
+                clearInterval(progressInterval);
+                showStatus(statusDiv, 'error', '❌ Generation failed: ' + error.message);
+            }
+            
+            btnText.textContent = '🎯 Generate Android App';
+        }
+        
+        // Update preview
+        function updatePreview(appName, description) {
+            const phoneScreen = document.getElementById('phoneScreen');
+            phoneScreen.innerHTML = `
+                <div style="padding: 20px;">
+                    <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
+                        <h2 style="margin: 0; font-size: 1.5rem;">${appName}</h2>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <h3 style="margin: 0 0 10px 0; color: #333; font-size: 1rem;">About this app:</h3>
+                        <p style="margin: 0; color: #666; font-size: 0.9rem;">${description}</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="background: #007bff; color: white; padding: 12px 25px; border-radius: 25px; display: inline-block; margin: 5px;">
+                            Launch App
+                        </div>
+                        <div style="background: #28a745; color: white; padding: 12px 25px; border-radius: 25px; display: inline-block; margin: 5px;">
+                            Settings
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Export project
+        async function exportProject() {
+            if (!currentAppData) {
+                alert('Please generate an app first');
+                return;
+            }
+            
+            const btnText = document.getElementById('exportBtnText');
+            const statusDiv = document.getElementById('exportStatus');
+            
+            btnText.innerHTML = '<div class="loading"></div> Exporting...';
+            
+            try {
+                const response = await fetch('/api/export-project', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentAppData)
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${currentAppData.appName}_project.zip`;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    
+                    showStatus(statusDiv, 'success', '✅ Project exported successfully!');
+                } else {
+                    showStatus(statusDiv, 'error', '❌ Export failed');
+                }
+            } catch (error) {
+                showStatus(statusDiv, 'error', '❌ Export failed: ' + error.message);
+            }
+            
+            btnText.textContent = '💾 Download Project ZIP';
+        }
+        
+        // Build APK
+        async function buildAPK() {
+            if (!currentAppData) {
+                alert('Please generate an app first');
+                return;
+            }
+            
+            const btnText = document.getElementById('buildBtnText');
+            btnText.innerHTML = '<div class="loading"></div> Building...';
+            
+            try {
+                const response = await fetch('/api/build-apk', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentAppData)
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${currentAppData.appName}_demo.apk`;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                }
+            } catch (error) {
+                console.error('Build failed:', error);
+            }
+            
+            btnText.textContent = '🔨 Build APK (Demo)';
+        }
+        
+        // Helper functions
+        function showStatus(element, type, message) {
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+            setTimeout(() => element.innerHTML = '', 5000);
+        }
+        
+        function exportToGitHub() {
+            alert('GitHub export feature coming soon!');
+        }
+        
+        function openInAndroidStudio() {
+            alert('Android Studio integration coming soon!');
+        }
+        
+        function showAIAssistant() {
+            alert('AI Assistant: Hello! I can help you build amazing Android apps. Try generating an app first!');
+        }
+        
         // Load app templates
         function loadTemplate(template) {
             const templates = {
                 weather: {
                     name: "WeatherApp",
+<<<<<<< HEAD
                     description: "A comprehensive weather application with current conditions, hourly forecasts, 7-day predictions, weather maps, and location-based services. Features beautiful animations, Material Design 3 UI, and offline support.",
                     category: "weather"
                 },
@@ -1042,12 +1270,28 @@ public class MainActivity extends AppCompatActivity {
                     name: "FitTrack",
                     description: "A comprehensive fitness tracking application with workout routines, exercise logging, progress charts, calorie counter, and achievement badges. Includes health metrics, reminders, and social sharing.",
                     category: "health"
+=======
+                    description: "A comprehensive weather application with current conditions, hourly forecasts, 7-day predictions, weather maps, and location-based services. Features beautiful animations, Material Design 3 UI, and offline support."
+                },
+                todo: {
+                    name: "TodoApp",
+                    description: "A modern task management application with categories, due dates, reminders, and progress tracking. Includes local storage, search functionality, and a clean Material Design interface."
+                },
+                chat: {
+                    name: "ChatApp",
+                    description: "A real-time messaging application with user authentication, group chats, media sharing, and push notifications. Features modern chat UI with message status indicators."
+                },
+                fitness: {
+                    name: "FitnessTracker",
+                    description: "A comprehensive fitness tracking application with workout logging, progress charts, goal setting, and health metrics. Includes integration with device sensors and modern UI."
+>>>>>>> 081c6355387854342756229a48279465ee740f71
                 }
             };
             
             if (templates[template]) {
                 document.getElementById('appName').value = templates[template].name;
                 document.getElementById('appDescription').value = templates[template].description;
+<<<<<<< HEAD
                 document.getElementById('appCategory').value = templates[template].category;
                 
                 // Show a notification
@@ -1251,10 +1495,125 @@ public class MainActivity extends AppCompatActivity {
                             <div style="font-size: 20px;">⚙️</div>
                             <div style="font-size: 12px;">Settings</div>
                         </div>
+=======
+                
+                // Switch to basic tab
+                switchTab('basic');
+                
+                // Show feedback
+                const statusDiv = document.getElementById('generationStatus');
+                showStatus(statusDiv, 'success', `✅ ${templates[template].name} template loaded!`);
+            }
+        }
+
+        // Sign APK function
+        async function signAPK() {
+            if (!currentAppData) {
+                alert('Please generate an app first');
+                return;
+            }
+            
+            const btnText = document.getElementById('signBtnText');
+            const statusDiv = document.getElementById('exportStatus');
+            
+            btnText.innerHTML = '<div class="loading"></div> Signing...';
+            
+            try {
+                const response = await fetch('/api/sign-apk', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentAppData)
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${currentAppData.appName}_signed.apk`;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    
+                    showStatus(statusDiv, 'success', '✅ APK signed and ready for installation!');
+                } else {
+                    showStatus(statusDiv, 'error', '❌ APK signing failed');
+                }
+            } catch (error) {
+                showStatus(statusDiv, 'error', '❌ Signing failed: ' + error.message);
+            }
+            
+            btnText.textContent = '✍️ Sign APK';
+        }
+
+        // Enhanced export to GitHub
+        async function exportToGitHub() {
+            if (!currentAppData) {
+                alert('Please generate an app first');
+                return;
+            }
+            
+            const repoName = prompt('Enter GitHub repository name:', currentAppData.appName);
+            if (!repoName) return;
+            
+            const statusDiv = document.getElementById('exportStatus');
+            showStatus(statusDiv, 'info', '🔄 Creating GitHub repository...');
+            
+            try {
+                const response = await fetch('/api/export-to-github', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ...currentAppData,
+                        repoName: repoName
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showStatus(statusDiv, 'success', `✅ Exported to GitHub! Repository: ${result.repoUrl}`);
+                    setTimeout(() => {
+                        window.open(result.repoUrl, '_blank');
+                    }, 2000);
+                } else {
+                    showStatus(statusDiv, 'warning', '⚠️ GitHub export requires authentication. Download ZIP and upload manually.');
+                }
+            } catch (error) {
+                showStatus(statusDiv, 'warning', '⚠️ GitHub export not available. Use ZIP export instead.');
+            }
+        }
+
+        // Enhanced Android Studio integration
+        function openInAndroidStudio() {
+            if (!currentAppData) {
+                alert('Please generate an app first');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('exportStatus');
+            showStatus(statusDiv, 'info', '🛠️ Instructions for Android Studio:');
+            
+            const instructions = `
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">📋 Android Studio Setup:</h4>
+                    <ol style="margin: 0; padding-left: 20px; line-height: 1.6;">
+                        <li>First, download the project ZIP using the button above</li>
+                        <li>Extract the ZIP file to your desired location</li>
+                        <li>Open Android Studio</li>
+                        <li>Select "Open an existing Android Studio project"</li>
+                        <li>Navigate to the extracted folder and select it</li>
+                        <li>Wait for Gradle sync to complete</li>
+                        <li>Connect your device or start an emulator</li>
+                        <li>Click the "Run" button to build and install</li>
+                    </ol>
+                    <div style="background: #e3f2fd; padding: 10px; border-radius: 5px; margin-top: 15px;">
+                        <strong>💡 Tip:</strong> Make sure you have Android SDK and build tools installed!
+>>>>>>> 081c6355387854342756229a48279465ee740f71
                     </div>
                 </div>
             `;
             
+<<<<<<< HEAD
             phoneScreen.innerHTML = previewHTML;
         }     
    
@@ -1917,3 +2276,10 @@ function prepareForAndroidStudio() {
     });
 }
 </script>
+=======
+            statusDiv.innerHTML = instructions;
+        }
+    </script>
+</body>
+</html>
+>>>>>>> 081c6355387854342756229a48279465ee740f71
