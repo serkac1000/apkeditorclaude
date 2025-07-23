@@ -1,0 +1,29 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+    
+    // Explicitly enable AndroidX
+    versionCatalogs {
+        create("libs") {
+            library("androidx-appcompat", "androidx.appcompat:appcompat:1.6.1")
+        }
+    }
+}
+
+rootProject.name = "MyAwesomeApp"
+include ":app"
+
+// Ensure AndroidX is enabled
+gradle.ext.useAndroidX = true
+gradle.ext.enableJetifier = true
